@@ -1,5 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import random
+import math
 
 ## an important thing to consider when using the class problem
 # is the structure of variables and attributes.
@@ -206,10 +208,89 @@ class Problem:
     # No path was found
         return None
 
+    def hill_climbing(self, start_node, goal_node):
+        # Define a nested function to get the best successor node
+        def get_best_successor():
+            # Get all the neighbors (successors) of the current node
+            successors = self.graph.neighbors(current_node)
+            # Initialize variables to keep track of the best successor and its score
+            best_successor = None
+            best_score = float("inf")
+            # Loop over all the successors to find the one with the best score
+            for successor in successors:
+                # Compute the score of the current successor
+                score = self.graph.get_edge_weight(current_node, successor) + self.heuristic(successor, goal_node)
+                # Update the best successor and its score if the current successor has a better score
+                if score < best_score:
+                    best_successor = successor
+                    best_score = score
+            # Return the best successor
+            return best_successor
 
-    
+        # Initialize the current node to the start node
+        current_node = start_node
+        # Loop until we reach the goal node or can't find a better successor
+        while current_node != goal_node:
+            # Get the best successor of the current node
+            successor = get_best_successor()
+            # If there's no better successor, return the current node (we're stuck)
+            if successor is None or self.heuristic(successor, goal_node) >= self.heuristic(current_node, goal_node):
+                return current_node
+            # Otherwise, set the current node to the best successor and continue the loop
+            current_node = successor
+        # If we reach this point, we've found the goal node
+        return current_node
 
-
-
-
-
+    def simulated_annealing(self, start_node, max_iterations=1000, temperature=1.0, cooling_rate=0.003):
+            # Initialize the current state as the start node
+            current_node = start_node
+            current_value = self.get_heuristic_value(current_node)
+            
+            # Initialize the best state as the current node
+            best_node = current_node
+            best_value = current_value
+            
+            # Initialize the iteration count
+            iteration = 1
+            
+            # Loop until max_iterations is reached
+            while iteration <= max_iterations:
+                # Calculate the current temperature based on cooling rate and iteration count
+                current_temperature = temperature / (1 + cooling_rate * iteration)
+                
+                # Get a random neighbor of the current node
+                neighbor_nodes = list(self.graph.neighbors(current_node))
+                if not neighbor_nodes:
+                    break
+                random_neighbor = random.choice(neighbor_nodes)
+                neighbor_value = self.get_heuristic_value(random_neighbor)
+                
+                # Calculate the energy difference between the current and neighbor states
+                energy_diff = current_value - neighbor_value
+                
+                # If the neighbor is better, move to that state
+                if energy_diff > 0:
+                    current_node = random_neighbor
+                    current_value = neighbor_value
+                    # If the neighbor is also better than the best state, update the best state
+                    if current_value < best_value:
+                        best_node = current_node
+                        best_value = current_value
+                # If the neighbor is worse, randomly move to that state with a probability dependent on temperature
+                else:
+                    probability = math.exp(energy_diff / current_temperature)
+                    if random.random() < probability:
+                        current_node = random_neighbor
+                
+                # Increment the iteration count
+                iteration += 1
+            
+            # Return the best state found
+            return best_node
+        
+    def get_heuristic_value(self, node):
+            try:
+                return self.graph.nodes[node]['h']
+            except KeyError:
+                return float('inf')
+            
