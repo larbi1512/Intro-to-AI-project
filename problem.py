@@ -122,6 +122,92 @@ class Problem:
     def graph(self):
         return self.__graph
     
+    # depth-limited-search
+    def depth_limited_search(self, start_node, goal_node, depth_limit):
+    
+        # Search the deepest nodes in the search tree first using depth-limited search.
+        # Returns the path to the goal node if it is found within the depth limit, otherwise returns None.
+    
+        def recursive_dls(node, depth):
+            if depth == 0 and node == goal_node:
+                return [node]
+            elif depth > 0:
+                for child in problem.graph.neighbors(node):
+                    result = recursive_dls(child, depth-1)
+                    if result is not None:
+                        return [node] + result
+            return None
+
+        for depth in range(depth_limit):
+            result = recursive_dls(start_node, depth)
+            if result is not None:
+                return result
+        return None
+    
+    #Iterative deepening depth-first-search:
+    def iterative_deepening_depth_first_search(self, start_node, goal_node, max_depth):
+        for depth in range(1, max_depth + 1):
+            result = depth_limited_search(problem, start_node, goal_node, depth)
+            if result is not None:
+                return result
+        return None
+    # Bidirectional search
+
+    def bidirectional_search(self, start, goal):
+        # Initialize the forward and backward search graphs
+        forward_graph = problem.graph.subgraph([start])
+        backward_graph = problem.graph.subgraph([goal])
+
+    # Initialize the sets of explored nodes for each direction
+        forward_explored = set([start])
+        backward_explored = set([goal])
+
+    # Initialize the queue of nodes to explore for each direction
+        forward_queue = [start]
+        backward_queue = [goal]
+
+    # Loop until the two search frontiers meet
+        while forward_queue and backward_queue:
+        # Check if there is an intersection of the forward and backward explored sets
+            intersection = forward_explored.intersection(backward_explored)
+            if intersection:
+            # We have found a path from start to goal
+                path = []
+                node = intersection.pop()
+                # Follow the path from start to the intersection node
+                while node != start:
+                    path.append(node)
+                    node = next(n for n in forward_graph.predecessors(node))
+                path.append(start)
+                path.reverse()
+            # Follow the path from the intersection node to the goal
+                node = next(n for n in backward_graph.predecessors(node))
+                while node != goal:
+                    path.append(node)
+                    node = next(n for n in backward_graph.predecessors(node))
+                path.append(goal)
+                return path
+
+        # Explore one step in each direction
+            forward_node = forward_queue.pop(0)
+            for neighbor in problem.graph.neighbors(forward_node):
+                if neighbor not in forward_explored:
+                    forward_graph.add_edge(forward_node, neighbor)
+                    forward_explored.add(neighbor)
+                    forward_queue.append(neighbor)
+
+            backward_node = backward_queue.pop(0)
+            for neighbor in problem.graph.neighbors(backward_node):
+                if neighbor not in backward_explored:
+                    backward_graph.add_edge(backward_node, neighbor)
+                    backward_explored.add(neighbor)
+                    backward_queue.append(neighbor)
+
+    # No path was found
+        return None
+
+
+    
 
 
 
