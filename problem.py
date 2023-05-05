@@ -123,7 +123,7 @@ class Problem:
         return self.__graph
     
     # depth-limited-search
-    def depth_limited_search(problem, start_node, goal_node, depth_limit):
+    def depth_limited_search(self, start_node, goal_node, depth_limit):
     
         # Search the deepest nodes in the search tree first using depth-limited search.
         # Returns the path to the goal node if it is found within the depth limit, otherwise returns None.
@@ -145,7 +145,7 @@ class Problem:
         return None
     
     #Iterative deepening depth-first-search:
-    def iterative_deepening_depth_first_search(problem, start_node, goal_node, max_depth):
+    def iterative_deepening_depth_first_search(self, start_node, goal_node, max_depth):
         for depth in range(1, max_depth + 1):
             result = depth_limited_search(problem, start_node, goal_node, depth)
             if result is not None:
@@ -153,7 +153,7 @@ class Problem:
         return None
     # Bidirectional search
 
-    def bidirectional_search(problem, start, goal):
+    def bidirectional_search(self, start, goal):
         # Initialize the forward and backward search graphs
         forward_graph = problem.graph.subgraph([start])
         backward_graph = problem.graph.subgraph([goal])
