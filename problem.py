@@ -287,7 +287,38 @@ class Problem:
             
             # Return the best state found
             return best_node
-        
+
+    @staticmethod
+    def child(self, parent, edge):
+        if edge[0] == parent:
+            return edge[1]
+        else:
+            return None
+
+    def minimax(self, node, depth, alpha, beta, maximizing_player):
+        if depth == 0 or self.graph.out_degree(node) == 0:
+            return self.graph.nodes[node]['h']
+
+        if maximizing_player:
+            max_value = float("inf")
+            for child in self.graph.successors(node):
+                value = self.minimax(child, depth - 1, alpha, beta, False)
+                max_value = max(max_value, value)
+                alpha = max(alpha, max_value)
+                if beta <= alpha:
+                    break
+            return max_value
+        else:
+            min_value = float("inf")
+            for child in self.graph.successors(node):
+                value = self.minimax(child, depth - 1, alpha, beta, True)
+                min_value = min(min_value, value)
+                beta = min(beta, min_value)
+                if beta <= alpha:
+                    break
+            return min_value
+
+
     def get_heuristic_value(self, node):
             try:
                 return self.graph.nodes[node]['h']
