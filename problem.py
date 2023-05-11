@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 class Problem:
     # in the constracture, every attribute is optional
     # to provide, except for th edges_list attribute
-    def __init__(self, edges_list, nodes_list = None, heuristic_values_list = None, digraph = False):
+    def __init__(self, edges_list = None, nodes_list = None, heuristic_values_list = None, digraph = False):
         self.__digraph = digraph
         if(self.__digraph):
             self.__graph = nx.DiGraph()
@@ -113,10 +113,10 @@ class Problem:
     #this function sets or modify the heuristic value of the node provided 
     # in node_name to new_heuristic_value
     #however if this node doesn't exist, it will be created
-    def modify_heuristic_value(self, node_name, new_heuristic_value):
+    def modify_heuristic_value(self, node_name, goal_node, new_heuristic_value):
         if node_name not in self.__graph.nodes:
             self.__graph.add_node(node_name)
-        self.__graph.nodes[node_name]['h'] = new_heuristic_value
+        self.__graph.nodes[node_name][goal_node] = new_heuristic_value
 
     @property
     def graph(self):
