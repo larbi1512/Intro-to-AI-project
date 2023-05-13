@@ -41,14 +41,16 @@ class AI_player:
         return board.player_turn_symbol
     
     def evaluation_function(self, board: Board):
-        evaluation = board.player_situation(symbol["max"]) - board.player_situation(symbol["min"])
-        if(board.turn_number > 4 and board.turn_number <= board.size / 2):
+        evaluation = 0.5 * (board.player_situation(symbol["max"]) - board.player_situation(symbol["min"]))
+        
+        if(board.turn_number > 4 and board.turn_number <= board.size / 2 + board.size / 4):
             evaluation += 2*(board.player_score(symbol["max"], 2) - board.player_score(symbol["min"], 2))
+
 
         if(board.turn_number > 5 and board.turn_number <= board.size / 2 + board.size / 4):
             evaluation += 3*(board.player_score(symbol["max"], 3) - board.player_score(symbol["min"], 3))
         if(board.turn_number > 6):
-            evaluation += 4 * self.value(board)
+            evaluation += 8 * self.value(board)
 
         return evaluation
     
@@ -94,10 +96,6 @@ class AI_player:
                 evaluation = self.minimax(child, depth - 1, alpha, beta, symbol["max"])
 
                 if(evaluation < min_evaluation):
-                    if(depth == 2):
-                        print("the turn number: " , board.turn_number)
-                        print("4*", self.value(child), "and", self.evaluation_function(child))
-                        print("the real evaluation: ", evaluation)
                     min_evaluation = evaluation
 
                 beta = min(beta, evaluation)
@@ -159,10 +157,6 @@ class AI_player:
                 evaluation = self.minimax(child, depth, alpha, beta, symbol["max"])
                 
                 if(evaluation < min_evaluation):
-                    if(depth == 2):
-                        print("the turn number: " , board.turn_number)
-                        print("4*", self.value(child), "and", self.evaluation_function(child))
-                        print("the real evaluation: ", evaluation)
                     best_action = child
                     min_evaluation = evaluation
 
