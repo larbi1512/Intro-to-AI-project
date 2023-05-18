@@ -1,7 +1,7 @@
 import numpy as np
 
 good = {
-     "min": 0,
+     #"min": 0,
       "max": 1
       }
 def count_consecutive_crosses(arr):
@@ -151,7 +151,11 @@ def count_consecutive_crosses(arr):
 
         return counter
 
-arr = np.array([[0, 0, 1, 1], [0, 0, 0, 1], [0, 0, 1, 1], [1, 1, 1, 0]])
+arr = np.array([[0, 0, 0, 1, 1], 
+                [1, 0, 1, 1, 0], 
+                [1, 1, 1, 1, 0], 
+                [0, 1, 1, 0, 1], 
+                [0, 0, 1, 1, 1]])
 
 count = count_consecutive_crosses(arr)
 

@@ -21,7 +21,7 @@ import math
 # 
 # 
 # example of heuristic_values_list:
-# [(1,  {'h': 20}), (4,  {'h': 2}), ("A",  {'h': 3}), ("C",  {'h': 14})] (remark: the letter "h" here stands for heuristic value)
+# [(1,  {'h': 20}), (4,  {'h': 2}), ("A",  {'h': 3}), ("C",  {'h': 14})] (remark: the letter "h" here stands for the goal node)
 
 
 

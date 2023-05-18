@@ -1,4 +1,6 @@
+import pygame
 import numpy as np
+from constaints import *
 
 
 # The functions of the class Board:
@@ -27,11 +29,16 @@ agent = {
     }
 class Board:
     def __init__(self, size = 6):
+        self.size = size
         if(size < 4 or size > 12):
             self.size = 6
         self.__matrix = np.zeros((self.size, self.size))
         self.__player_turn_symbol = symbol["cross"]
+        self.hovered_square = (-1, -1)
         self.__turn_number = 1
+
+        self.SQUARE_SIZE = BOARD_SIZE / self.size - LINE_WIDTH
+        self.CIRCLE_RADIUS = (self.SQUARE_SIZE / 2) - SQUARE_PADDING
 
     @property
     def size(self):
@@ -52,9 +59,12 @@ class Board:
         return self.__matrix
     
     def set_cell(self, row, col):
+        if row >= self.size or col >= self.size or row < 0 or col < 0:
+             return False
+        
         if self.__matrix[row][col] == symbol["blank"]:
             self.__matrix[row][col] = self.__player_turn_symbol
-            self.player_turn_symbol(1)
+            self.player_turn_symbol = 1
             self.__turn_number += 1
             return True
         
@@ -68,6 +78,7 @@ class Board:
     def player_turn_symbol(self, n):
          if self.__player_turn_symbol == symbol["cross"]:
               self.__player_turn_symbol = symbol["circle"]
+              return
 
          if self.__player_turn_symbol == symbol["circle"]:
               self.__player_turn_symbol = symbol["cross"]
@@ -75,9 +86,17 @@ class Board:
     @property
     def turn_number(self):
          return self.__turn_number
+    
+    @property
+    def hovered_square(self):
+         return self.__hovered_square
+    
+    @hovered_square.setter
+    def hovered_square(self, position):
+         self.__hovered_square = position
 
-    def player_score(self, player_symbol):
-        if not(player_symbol in symbol):
+    def player_score(self, player_symbol, line_width=4):
+        if player_symbol not in list(symbol.values()):
             print("invalid symbol number")
             return -1
         
@@ -86,11 +105,10 @@ class Board:
         i = 0
         while i < self.size:
             j = 0
-            while j < self.size - 3:
-                if(self.__matrix[i][j] == player_symbol and self.__matrix[i][j+1] == player_symbol and self.__matrix[i][j+2]
-                   == player_symbol and self.__matrix[i][j+3] == player_symbol):
+            while j < self.size - (line_width - 1):
+                if all(self.__matrix[i][j+k] == player_symbol for k in range(line_width)):
                     counter += 1
-                    j += 4
+                    j += line_width
                     while j < self.size and self.__matrix[i][j] == player_symbol:
                         counter += 1
                         j += 1
@@ -103,11 +121,10 @@ class Board:
         j = 0
         while j < self.size:
             i = 0
-            while i < self.size - 3:
-                if(self.__matrix[i][j] == player_symbol and self.__matrix[i+1][j] == player_symbol and self.__matrix[i+2][j]
-                    == player_symbol and self.__matrix[i+3][j] == player_symbol):
+            while i < self.size - (line_width - 1):
+                if all(self.__matrix[i+k][j] == player_symbol for k in range(line_width)):
                     counter += 1
-                    i += 4
+                    i += line_width
                     while i < self.size and self.__matrix[i][j] == player_symbol:
                         counter += 1
                         i += 1
@@ -126,15 +143,14 @@ class Board:
                 return [i, j]
             
         # check right-down
-        i = self.size - 4
+        i = self.size - line_width
         j = 0
-        while(j < self.size - 3):
-            while (i < self.size - 3 and i >= j) or (j < self.size - 3 and j >= i):
-                if(self.__matrix[i][j] == player_symbol and self.__matrix[i+1][j+1] == player_symbol and self.__matrix[i+2][j+2]
-                        == player_symbol and self.__matrix[i+3][j+3] == player_symbol):
+        while(j < self.size - (line_width - 1)):
+            while (i < self.size - (line_width - 1) and i >= j) or (j < self.size - (line_width - 1) and j >= i):
+                if all(self.__matrix[i+k][j+k] == player_symbol for k in range(line_width)):
                         counter += 1
-                        i += 4
-                        j += 4
+                        i += line_width
+                        j += line_width
                         while (i < self.size and j < self.size) and self.__matrix[i][j] == player_symbol:
                             counter += 1
                             i += 1
@@ -142,7 +158,7 @@ class Board:
                 else:
                         i += 1
                         j += 1
-                        if(j >= self.size - 3 or i >= self.size - 3):
+                        if(j >= self.size - (line_width - 1) or i >= self.size - (line_width - 1)):
                              if i == j:
                                   j = 0; i = 0
                              elif i > j:
@@ -175,15 +191,14 @@ class Board:
 
         self.__matrix = np.dot(self.__matrix, mirror_arr)
 
-        i = self.size - 4
+        i = self.size - line_width
         j = 0
-        while(j < self.size - 3):
-            while (i < self.size - 3 and i >= j) or (j < self.size - 3 and j >= i):
-                if(self.__matrix[i][j] == player_symbol and self.__matrix[i+1][j+1] == player_symbol and self.__matrix[i+2][j+2]
-                        == player_symbol and self.__matrix[i+3][j+3] == player_symbol):
+        while(j < self.size - (line_width - 1)):
+            while (i < self.size - (line_width - 1) and i >= j) or (j < self.size - (line_width - 1) and j >= i):
+                if  all(self.__matrix[i+k][j+k] == player_symbol for k in range(line_width)):
                         counter += 1
-                        i += 4
-                        j += 4
+                        i += line_width
+                        j += line_width
                         while (i < self.size and j < self.size) and self.__matrix[i][j] == player_symbol:
                             counter += 1
                             i += 1
@@ -191,7 +206,7 @@ class Board:
                 else:
                         i += 1
                         j += 1
-                        if(j >= self.size - 3 or i >= self.size - 3):
+                        if(j >= self.size - (line_width - 1) or i >= self.size - (line_width - 1)):
                              if i == j:
                                   j = 0; i = 0
                              elif i > j:
@@ -219,7 +234,7 @@ class Board:
         return counter
     
     def player_situation(self, player_symbol):
-        if not(player_symbol in symbol):
+        if player_symbol not in list(symbol.values()):
             print("invalid symbol number")
             return -1
         
@@ -364,20 +379,95 @@ class Board:
     def is_board_full(self):
          for row in self.__matrix:
               for cell in row:
-                   if cell != symbol["blank"]:
+                   if cell == symbol["blank"]:
                         return False
                    
          return True
     
     def reset_board(self, size = 0):
-         if(size):
-              size = self.size
-         self.size = size
-         self.__player_turn_symbol = symbol["cross"]
-         self.__turn_number = 1
+         self.__init__(self.size)
 
-    def display_board(self):
+    def draw_board(self, win):
+         (mouse_x, mouse_y) = pygame.mouse.get_pos()
+         self.hovered_square = (-1, -1)
+         for row in range(self.size):
+              for col in range(self.size):
+                   if(mouse_x <= WINDOW_PADDING + LINE_WIDTH * row + row * self.SQUARE_SIZE + self.SQUARE_SIZE and 
+                      mouse_x >= WINDOW_PADDING + LINE_WIDTH * row + row * self.SQUARE_SIZE and 
+                      mouse_y <= WINDOW_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE + self.SQUARE_SIZE and 
+                      mouse_y >= WINDOW_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE and 
+                      self.matrix[row][col] == symbol["blank"]):
+                        pygame.draw.rect(win, YELLOW, (WINDOW_PADDING + LINE_WIDTH * row + row * self.SQUARE_SIZE, WINDOW_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
+                        self.hovered_square =  (row, col)
+                   else:
+                        pygame.draw.rect(win, GRAY, (WINDOW_PADDING + LINE_WIDTH * row + row * self.SQUARE_SIZE, WINDOW_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
+
+         self.draw_figures(win)
+
+         self.display_score(win)
+    
+    def draw_cross(self, win, row, col):
+
+         pygame.draw.line(win, RED, (WINDOW_PADDING + SQUARE_PADDING + CROSS_WIDTH/10 + LINE_WIDTH * row + row * self.SQUARE_SIZE, WINDOW_PADDING + SQUARE_PADDING
+                                      + LINE_WIDTH * col + col * self.SQUARE_SIZE),
+                          (WINDOW_PADDING - (SQUARE_PADDING + CROSS_WIDTH/10)+ LINE_WIDTH * row + row * self.SQUARE_SIZE + self.SQUARE_SIZE,
+                             WINDOW_PADDING - SQUARE_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE + self.SQUARE_SIZE), CROSS_WIDTH)
+         
+         pygame.draw.line(win, RED, (int(WINDOW_PADDING - (SQUARE_PADDING + CROSS_WIDTH/10) + LINE_WIDTH * row + row * self.SQUARE_SIZE + self.SQUARE_SIZE),
+                                      int(WINDOW_PADDING + SQUARE_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE)),
+                           (int(WINDOW_PADDING + SQUARE_PADDING + CROSS_WIDTH/10 + LINE_WIDTH * row + row * self.SQUARE_SIZE), int(WINDOW_PADDING - SQUARE_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE 
+                            + self.SQUARE_SIZE)), CROSS_WIDTH)
+    
+    def draw_figures(self, win):
+         for row in range(self.size):
+              for col in range(self.size):
+                if self.matrix[row][col] == symbol["cross"]:
+                    self.draw_cross(win, row, col)
+                elif self.matrix[row][col] == symbol["circle"]:
+                    self.draw_circle(win, row, col)
+
+    def display_score(self, win):
+         fontname = 'times'
+         fontsize = 38
+         font = pygame.font.SysFont(fontname, fontsize)
+
+         label = font.render("Connect 4 game", 1, (255, 255, 255))
+         win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 50, WINDOW_PADDING))
+
+         fontsize = 24
+         font = pygame.font.SysFont(fontname, fontsize)
+         # apply it to text on a label
+         label = font.render(f"Turn Number: {self.turn_number}", 1, (255, 255, 255))
+         # put the label object on the screen at point x=100, y=100
+         win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 100, WINDOW_PADDING + 500))
+
+         pygame.draw.circle( win, BLUE, (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2,
+                                          WINDOW_PADDING + 200), 
+                                          25, 7 )
+         
+         pygame.draw.line(win, RED, (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2 - 20, WINDOW_PADDING + 200 + 120),
+                          (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2 - 20 + 40,
+                             WINDOW_PADDING + 200 + 120 + 40), CROSS_WIDTH)
+         
+         pygame.draw.line(win, RED, (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2 - 20 + 40, WINDOW_PADDING + 200 + 120),
+                           (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2 - 20, WINDOW_PADDING + 200 + 120 + 40), CROSS_WIDTH)
+         
+         label = font.render(f"Score: {self.player_score(symbol['circle'])}", 1, (255, 255, 255))
+         win.blit(label, (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2 + 50, WINDOW_PADDING + 200 - 12.5))
+
+         label = font.render(f"Score: {self.player_score(symbol['cross'])}", 1, (255, 255, 255))
+         win.blit(label, (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2 + 50, WINDOW_PADDING + 200 + 8 + 120))
+                        
+
+    
+    def draw_circle(self, win, row, col):
+         pygame.draw.circle( win, BLUE, (WINDOW_PADDING + LINE_WIDTH * row + row * self.SQUARE_SIZE + self.SQUARE_SIZE / 2,
+                                          WINDOW_PADDING + LINE_WIDTH * col + col * self.SQUARE_SIZE + self.SQUARE_SIZE / 2), 
+                                          self.CIRCLE_RADIUS, CIRCLE_WIDTH )
+    
+    def display_turn(self, win):
          pass
+    
     
 
     
