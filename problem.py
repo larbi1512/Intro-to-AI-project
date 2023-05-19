@@ -157,8 +157,8 @@ class Problem:
 
     def bidirectional_search(self, start, goal):
         # Initialize the forward and backward search graphs
-        forward_graph = problem.graph.subgraph([start])
-        backward_graph = problem.graph.subgraph([goal])
+        forward_graph = self.graph.subgraph([start])
+        backward_graph = self.graph.subgraph([goal])
 
     # Initialize the sets of explored nodes for each direction
         forward_explored = set([start])
@@ -192,14 +192,14 @@ class Problem:
 
         # Explore one step in each direction
             forward_node = forward_queue.pop(0)
-            for neighbor in problem.graph.neighbors(forward_node):
+            for neighbor in self.graph.neighbors(forward_node):
                 if neighbor not in forward_explored:
                     forward_graph.add_edge(forward_node, neighbor)
                     forward_explored.add(neighbor)
                     forward_queue.append(neighbor)
 
             backward_node = backward_queue.pop(0)
-            for neighbor in problem.graph.neighbors(backward_node):
+            for neighbor in self.graph.neighbors(backward_node):
                 if neighbor not in backward_explored:
                     backward_graph.add_edge(backward_node, neighbor)
                     backward_explored.add(neighbor)

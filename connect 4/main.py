@@ -35,6 +35,7 @@ def main():
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 game.restart()
+                game.make_move_AI()
 
         WIN.fill((0, 0, 0))
         game.board.draw_board(WIN)
