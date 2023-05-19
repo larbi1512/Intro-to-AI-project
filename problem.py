@@ -134,7 +134,7 @@ class Problem:
             if depth == 0 and node == goal_node:
                 return [node]
             elif depth > 0:
-                for child in problem.graph.neighbors(node):
+                for child in self.graph.neighbors(node):
                     result = recursive_dls(child, depth-1)
                     if result is not None:
                         return [node] + result
@@ -149,9 +149,11 @@ class Problem:
     #Iterative deepening depth-first-search:
     def iterative_deepening_depth_first_search(self, start_node, goal_node, max_depth):
         for depth in range(1, max_depth + 1):
-            result = depth_limited_search(problem, start_node, goal_node, depth)
+            result = self.depth_limited_search(start_node, goal_node, depth)
             if result is not None:
+                print(result)
                 return result
+        print("Goal not found within the depth limit.")
         return None
     # Bidirectional search
 
