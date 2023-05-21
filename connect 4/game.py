@@ -21,7 +21,7 @@ class Game:
         self.circle_player = circle_player
         self.board = Board(size)
         self.ai = AI_player(symbol["circle"])
-
+        self.cross_player_score = self.circle_player_score = 0
 
     @property
     def cross_player(self):

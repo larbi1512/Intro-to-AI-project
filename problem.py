@@ -408,4 +408,3 @@ class Problem:
                 return self.graph.nodes[node]['h']
             except KeyError:
                 return float('inf')
-            

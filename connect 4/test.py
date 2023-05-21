@@ -95,13 +95,13 @@ def count_consecutive_crosses(arr):
 
 
         # check left-up
-        mirror_arr = np.zeros((len(arr), len(arr)))
+        self.mirror_arr = np.zeros((len(arr), len(arr)))
         for i in range(0, len(arr)):
              for j in range(0, len(arr)):
                   if i + j == len(arr) - 1:
-                       mirror_arr[i][j] = 1
+                       self.mirror_arr[i][j] = 1
 
-        arr = np.dot(arr, mirror_arr)
+        arr = np.dot(arr, self.mirror_arr)
 
         i = len(arr) - 4
         j = 0
@@ -145,7 +145,7 @@ def count_consecutive_crosses(arr):
             l = next_diago_line(i, j)
             i = l[0]; j = l[1]
 
-        arr = np.dot(arr, mirror_arr)
+        arr = np.dot(arr, self.mirror_arr)
 
 
 
