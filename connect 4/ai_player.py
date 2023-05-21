@@ -16,7 +16,17 @@ symbol = {
 
 DEPTH = 2
 
+def next_move(i, j, size):
+    if i >= size - j - 1 and i < j:
+        i += 1
+    elif j > size - i - 1 and j <= i:
+        j -= 1
+    elif i >= j and j <= size - i - 1:
+        i -= 1
+    else:
+        j += 1
 
+    return [i, j]
 class AI_player:
     def __init__(self, agent_symbol):
         self.symbol = agent_symbol
@@ -42,7 +52,7 @@ class AI_player:
     
     def evaluation_function(self, board: Board):
         evaluation = 0.5 * (board.player_situation(symbol["max"]) - board.player_situation(symbol["min"]))
-        
+
         if(board.turn_number > 4 and board.turn_number <= board.size / 2 + board.size / 4):
             evaluation += 2*(board.player_score(symbol["max"], 2) - board.player_score(symbol["min"], 2))
 
@@ -62,7 +72,17 @@ class AI_player:
         board_possible_next_states = []
         board_copy = copy.deepcopy(board)
 
+        i = int(np.floor(board.size / 2) - (not board.size % 2))
+        j = int(np.floor(board.size / 2) - (not board.size % 2) + (board.size + 1) % 2)
+        while i != -1:
+            if board_copy.set_cell(i, j):
+                board_possible_next_states.append(board_copy)
+                board_copy = copy.deepcopy(board)
 
+            l = next_move(i, j, board.size)
+            i = l[0]; j = l[1]
+
+        #remove this code
         for i in range(0, board_copy.size):
             for j in range(0, board_copy.size):
                 if board_copy.set_cell(i, j):
