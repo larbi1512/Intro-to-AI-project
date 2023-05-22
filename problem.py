@@ -106,6 +106,11 @@ class Problem:
     #also, if one or both nodes in the edge_couple doesn't exist, it will be created
     def modify_edge_weight(self, edge_couple, new_weight):
         self.__graph.add_edge(edge_couple[0], edge_couple[1], weight = new_weight)
+    
+    
+        
+    
+    
 
     #weight is an integer number
     def add_an_edge(self, edge_couple, weight=None):
@@ -125,6 +130,12 @@ class Problem:
     @property
     def graph(self):
         return self.__graph
+    # get the weight of the edge
+    def get_edge_weight(self, edge_couple):
+        return self.__graph.get_edge_data(edge_couple[0], edge_couple[1], default=0)
+    
+    
+    
     
     def breadth_first_search(self, start_node, goal_node):
         # Search the shallowest nodes in the search tree first using BFS.
@@ -153,7 +164,7 @@ class Problem:
                 return path
             for child in self.graph.neighbors(node):
                 if child not in path:
-                    child_cost = cost + self.graph.get_edge_data(node, child)[weight]
+                    child_cost = cost + self.get_edge_weight(("node", "child"))
                     queue.put((child_cost, child, path + [child]))
         return None
     
@@ -301,7 +312,7 @@ class Problem:
             # Loop over all the successors to find the one with the best score
             for successor in successors:
                 # Compute the score of the current successor
-                score = self.graph.get_edge_weight(current_node, successor) + self.heuristic(successor, goal_node)
+                score = self.graph.get_edge_data(current_node, successor) + self.heuristic(successor, goal_node)
                 # Update the best successor and its score if the current successor has a better score
                 if score < best_score:
                     best_successor = successor
