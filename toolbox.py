@@ -33,10 +33,11 @@ class toolbox:
                 self.__problem.graph, 'weight')
             print(edge_labels)
             # Draw the new graph with the updated colors and the initial positions of the nodes
-            nx.draw(self.__problem.graph, init_pos,
-                    node_color=node_colors, with_labels=True)
-            nx.draw_networkx_edge_labels(
-                self.__problem.graph, init_pos, edge_labels=edge_labels)
+
+            nx.draw(self.__problem.graph, init_pos, node_color=node_colors, with_labels=True)
+            nx.draw_networkx_edge_labels(self.__problem.graph, init_pos, edge_labels=edge_labels)
+            nx.draw_networkx_labels(self.__problem.graph, init_pos, labels=nx.get_node_attributes(self.__problem.graph, 'h'))
+
 
         # Create the animation
         ani = FuncAnimation(plt.gcf(), update, frames=len(
