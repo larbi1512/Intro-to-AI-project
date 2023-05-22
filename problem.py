@@ -2,6 +2,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 import math
+from queue import PriorityQueue
+from collections import deque
 
 ## an important thing to consider when using the class problem
 # is the structure of variables and attributes.
@@ -123,6 +125,84 @@ class Problem:
     @property
     def graph(self):
         return self.__graph
+    
+    def breadth_first_search(self, start_node, goal_node):
+        # Search the shallowest nodes in the search tree first using BFS.
+        # Returns the path to the goal node if it is found, otherwise returns None.
+        visited = set()
+        queue = deque([(start_node, [start_node])])
+        while queue:
+            node, path = queue.popleft()
+            if node == goal_node:
+                return path
+            visited.add(node)
+            for child in self.graph.neighbors(node):
+                if child not in visited and child not in path:
+                    queue.append((child, path + [child]))
+        return None
+    
+    # uniform-cost search
+    def uniform_cost_search(self, start_node, goal_node):
+        # Search the node that has the lowest cumulative cost first.
+        # Returns the path to the goal node if it is found, otherwise returns None.
+        queue = PriorityQueue()
+        queue.put((0, start_node, [start_node]))
+        while queue:
+            cost, node, path = queue.get()
+            if node == goal_node:
+                return path
+            for child in self.graph.neighbors(node):
+                if child not in path:
+                    child_cost = cost + self.graph.get_edge_data(node, child)[weight]
+                    queue.put((child_cost, child, path + [child]))
+        return None
+    
+    # A* search
+    def a_star_search(self, start_node, goal_node):
+        # Search the node that has the lowest combined cost and heuristic first.
+        # Returns the path to the goal node if it is found, otherwise returns None.
+        queue = PriorityQueue()
+        queue.put((0, start_node, [start_node]))
+        while queue:
+            cost, node, path = queue.get()
+            if node == goal_node:
+                return path
+            for child in self.graph.neighbors(node):
+                if child not in path:
+                    child_cost = cost + self.graph.get_edge_data(node, child)['weight'] + self.graph.nodes[child]['h']
+                    queue.put((child_cost, child, path + [child]))
+        return None
+    
+    #greedy best first search
+    def greedy_best_first_search(self, start_node, goal_node):
+        # Search the node that has the lowest heuristic first.
+        # Returns the path to the goal node if it is found, otherwise returns None.
+        queue = PriorityQueue()
+        queue.put((0, start_node, [start_node]))
+        while queue:
+            cost, node, path = queue.get()
+            if node == goal_node:
+                return path
+            for child in self.graph.neighbors(node):
+                if child not in path:
+                    child_cost = self.graph.nodes[child]['h']
+                    queue.put((child_cost, child, path + [child]))
+        return None
+    
+    
+    # depth-first search    
+    def depth_first_search(self, start_node, goal_node):
+        # Search the deepest nodes in the search tree first using DFS.
+        # Returns the path to the goal node if it is found, otherwise returns None.
+        stack = [(start_node, [start_node])]
+        while stack:
+            node, path = stack.pop()
+            if node == goal_node:
+                return path
+            for child in self.graph.neighbors(node):
+                if child not in path:
+                    stack.append((child, path + [child]))
+        return None
     
     # depth-limited-search
     def depth_limited_search(self, start_node, goal_node, depth_limit):
