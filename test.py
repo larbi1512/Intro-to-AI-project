@@ -6,4 +6,3 @@ t = toolbox(problem)
 t.animate_solution(problem.iterative_deepening_depth_first_search("A", "5", 5))
 
 
-
