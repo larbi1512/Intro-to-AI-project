@@ -48,7 +48,7 @@ class Problem:
 
         if initial_state:
             self.initial_state = initial_state
-            
+
         self.goal_states = goal_states
 
     # example of an initial_state:
