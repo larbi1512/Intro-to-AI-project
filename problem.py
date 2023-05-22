@@ -31,7 +31,7 @@ import deque
 class Problem:
     # in the constracture, every attribute is optional
     # to provide, except for th edges_list attribute
-    def __init__(self, edges_list = None, nodes_list = None, heuristic_values_list = None, digraph = False):
+    def __init__(self, edges_list, initial_state, goal_states: list, nodes_list = None, heuristic_values_list = None, digraph = False):
         self.__digraph = digraph
         if(self.__digraph):
             self.__graph = nx.DiGraph()
@@ -46,6 +46,31 @@ class Problem:
 
         self.edges_list = edges_list
 
+        self.initial_state = initial_state
+        self.goal_states = goal_states
+
+    # example of an initial_state:
+    # "A"
+    @property
+    def initial_state(self):
+        return self.__initial_state
+    
+    @initial_state.setter
+    def initial_state(self, value):
+        self.__initial_state = value
+        self.add_a_node(self.__initial_state)
+
+    @property
+    def goal_states(self):
+        return self.__goal_states
+    
+    @goal_states.setter
+    def goal_states(self, value):
+        self.__goal_states = value
+
+        for goal_node in self.__goal_states:
+            self.add_a_node(goal_node)
+
     @property
     def nodes_list(self):
         return self.__nodes_list
@@ -56,7 +81,8 @@ class Problem:
     # ["A", 1, 3, "m"]
     @nodes_list.setter
     def nodes_list(self, value):
-        self.__graph.add_nodes_from(value)
+        self.__nodes_list = value
+        self.__graph.add_nodes_from(self.__nodes_list)
 
     
     @property
@@ -73,7 +99,7 @@ class Problem:
     def heuristic_values_list(self):
         h = []
         for n in self.__graph.nodes(data = True):
-            h.append(n)
+            h.append((n[0], n[1]['h']))
 
         return h
     
@@ -117,10 +143,10 @@ class Problem:
     #this function sets or modify the heuristic value of the node provided 
     # in node_name to new_heuristic_value
     #however if this node doesn't exist, it will be created
-    def modify_heuristic_value(self, node_name, goal_node, new_heuristic_value):
+    def modify_heuristic_value(self, node_name, new_heuristic_value):
         if node_name not in self.__graph.nodes:
-            self.__graph.add_node(node_name)
-        self.__graph.nodes[node_name][goal_node] = new_heuristic_value
+            self.add_a_node(node_name)
+        self.__graph.nodes[node_name]['h'] = new_heuristic_value
 
     @property
     def graph(self):
