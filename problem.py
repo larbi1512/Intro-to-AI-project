@@ -31,7 +31,7 @@ import deque
 class Problem:
     # in the constracture, every attribute is optional
     # to provide, except for th edges_list attribute
-    def __init__(self, edges_list, initial_state, goal_states: list, nodes_list = None, heuristic_values_list = None, digraph = False):
+    def __init__(self, edges_list, initial_state = None, goal_states = [], nodes_list = None, heuristic_values_list = None, digraph = False):
         self.__digraph = digraph
         if(self.__digraph):
             self.__graph = nx.DiGraph()
@@ -46,7 +46,9 @@ class Problem:
 
         self.edges_list = edges_list
 
-        self.initial_state = initial_state
+        if initial_state:
+            self.initial_state = initial_state
+
         self.goal_states = goal_states
 
     # example of an initial_state:
