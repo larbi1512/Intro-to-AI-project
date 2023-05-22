@@ -2,6 +2,7 @@ import tkinter as tk
 from problem import Problem
 import networkx as nx
 from matplotlib.animation import FuncAnimation
+import matplotlib.pyplot as plt
 
 
 def get_user_edge(entry_1, entry_2, entry_3, p):
@@ -13,7 +14,7 @@ def get_user_edge(entry_1, entry_2, entry_3, p):
     edge.append(node_1)
     edge.append(node_2)
     p.add_an_edge(edge)
-    p.modify_edge_weight(edge, entry_3)
+    p.modify_edge_weight(edge, entry_3.get())
 
 
 def get_node_info(entry_1, entry_2, p):
@@ -64,8 +65,8 @@ def animate_solution(p, path):
                 node_color=node_colors, with_labels=True)
         nx.draw_networkx_edge_labels(
             p.graph, init_pos, edge_labels=edge_labels)
-        nx.draw_networkx_labels(p.graph, init_pos,
-                                labels=nx.get_node_attributes(p.graph, 'h'))
+        # nx.draw_networkx_labels(p.graph, init_pos,
+        #                   labels=nx.get_node_attributes(p.graph, 'h'))
 
     # Create the animation
     ani = FuncAnimation(plt.gcf(), update, frames=len(
@@ -345,11 +346,13 @@ def algorithms_menu(p, sender=0):
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="Depth limited first search", font=(
-        'Arial', 18))  # call the function of this algorithm
+        'Arial', 18), command=lambda: print(p.edges_list)
+    )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="Iterative deepening depth first search", font=(
-        'Arial', 18))  # call the function of this algorithm
+        'Arial', 18), command=lambda: print(p.heuristic_values_list)
+    )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="Hill climbing", font=(
@@ -357,7 +360,8 @@ def algorithms_menu(p, sender=0):
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="Simulated annealing", font=(
-        'Arial', 18))  # call the function of this algorithm
+        'Arial', 18), command=lambda: print(p.graph)
+    )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="Minimax", font=(
