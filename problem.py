@@ -2,46 +2,44 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 import math
-import deque
+from collections import deque
 
 
-## an important thing to consider when using the class problem
+# an important thing to consider when using the class problem
 # is the structure of variables and attributes.
 #
 # example of a node:
 # "A"
-# 
+#
 # example of an edge:
 # ("A", "B")
-# 
+#
 # two examples of nodes_list
 # "ABCDEFG"
 # ["A", 1, 3, "m"]
-# 
+#
 # example of edges_list
 # [("A", "B"), ("A", "C"), ("i am a node", "B")]
-# 
-# 
+#
+#
 # example of heuristic_values_list:
 # [(1,  {'h': 20}), (4,  {'h': 2}), ("A",  {'h': 3}), ("C",  {'h': 14})] (remark: the letter "h" here stands for the goal node)
-
-
 
 
 class Problem:
     # in the constracture, every attribute is optional
     # to provide, except for th edges_list attribute
-    def __init__(self, edges_list, initial_state = None, goal_states = [], nodes_list = None, heuristic_values_list = None, digraph = False):
+    def __init__(self, edges_list, initial_state=None, goal_states=[], nodes_list=None, heuristic_values_list=None, digraph=False):
         self.__digraph = digraph
-        if(self.__digraph):
+        if (self.__digraph):
             self.__graph = nx.DiGraph()
         else:
             self.__graph = nx.Graph()
 
-        if(nodes_list):
+        if (nodes_list):
             self.nodes_list = nodes_list
-        
-        if(heuristic_values_list):
+
+        if (heuristic_values_list):
             self.heuristic_values_list = heuristic_values_list
 
         self.edges_list = edges_list
@@ -56,7 +54,7 @@ class Problem:
     @property
     def initial_state(self):
         return self.__initial_state
-    
+
     @initial_state.setter
     def initial_state(self, value):
         self.__initial_state = value
@@ -65,46 +63,48 @@ class Problem:
     @property
     def goal_states(self):
         return self.__goal_states
-    
+
     @goal_states.setter
     def goal_states(self, value):
         self.__goal_states = value
-
         for goal_node in self.__goal_states:
             self.add_a_node(goal_node)
+
+    def add_goal_state(self, state):
+        self.__goal_states.append(state)
+        self.add_a_node(state)
 
     @property
     def nodes_list(self):
         return self.__nodes_list
-    
 
     # two examples of nodes_list
     # "ABCDEFG"
     # ["A", 1, 3, "m"]
+
     @nodes_list.setter
     def nodes_list(self, value):
         self.__nodes_list = value
         self.__graph.add_nodes_from(self.__nodes_list)
 
-    
     @property
     def edges_list(self):
         return self.__graph.edges
-    
+
     # example of edges_list
     # [("A", "B"), ("A", "C"), ("i am a node", "B")]
     @edges_list.setter
     def edges_list(self, value):
         self.__graph.add_edges_from(value)
-    
+
     @property
     def heuristic_values_list(self):
         h = []
-        for n in self.__graph.nodes(data = True):
+        for n in self.__graph.nodes(data=True):
             h.append((n[0], n[1]['h']))
 
         return h
-    
+
     # example of heuristic_values_list:
     # [(1,  {'h': 20}), (4,  {'h': 2}), ("A",  {'h': 3}), ("C",  {'h': 14})]
     @heuristic_values_list.setter
@@ -116,9 +116,10 @@ class Problem:
     @property
     def digraph(self):
         return self.__digraph
-    
+
     # example of a node:
     # "A"
+
     def add_a_node(self, node_name):
         self.__graph.add_node(node_name)
 
@@ -128,23 +129,25 @@ class Problem:
     def add_an_edge(self, edge_couple):
         self.__graph.add_edge(edge_couple)
 
-    #this function sets or modify the weight value of the edge provided 
+    # this function sets or modify the weight value of the edge provided
     # in edge_couple to new_weight
-    #however if this edge_couple doesn't exist, it will be created
-    #also, if one or both nodes in the edge_couple doesn't exist, it will be created
+    # however if this edge_couple doesn't exist, it will be created
+    # also, if one or both nodes in the edge_couple doesn't exist, it will be created
     def modify_edge_weight(self, edge_couple, new_weight):
-        self.__graph.add_edge(edge_couple[0], edge_couple[1], weight = new_weight)
+        self.__graph.add_edge(
+            edge_couple[0], edge_couple[1], weight=new_weight)
 
-    #weight is an integer number
+    # weight is an integer number
     def add_an_edge(self, edge_couple, weight=None):
         if weight is not None:
-            self.__graph.add_edge(edge_couple[0], edge_couple[1], weight=weight)
+            self.__graph.add_edge(
+                edge_couple[0], edge_couple[1], weight=weight)
         else:
             self.__graph.add_edge(edge_couple[0], edge_couple[1])
 
-    #this function sets or modify the heuristic value of the node provided 
+    # this function sets or modify the heuristic value of the node provided
     # in node_name to new_heuristic_value
-    #however if this node doesn't exist, it will be created
+    # however if this node doesn't exist, it will be created
     def modify_heuristic_value(self, node_name, new_heuristic_value):
         if node_name not in self.__graph.nodes:
             self.add_a_node(node_name)
@@ -153,10 +156,10 @@ class Problem:
     @property
     def graph(self):
         return self.__graph
-    
+
     # breadth-first search
     def breadth_first_search(self, start_node, goal_node):
-        
+
         # Search the shallowest nodes in the search tree first using BFS.
         # Returns the path to the goal node if it is found, otherwise returns None.
         visited = set()
@@ -170,7 +173,7 @@ class Problem:
                 if child not in visited and child not in path:
                     queue.append((child, path + [child]))
         return None
-    
+
     # uniform-cost search
     def uniform_cost_search(self, start_node, goal_node):
         # Search the node that has the lowest cumulative cost first.
@@ -183,10 +186,11 @@ class Problem:
                 return path
             for child in self.graph.neighbors(node):
                 if child not in path:
-                    child_cost = cost + self.graph.get_edge_data(node, child)['weight']
+                    child_cost = cost + \
+                        self.graph.get_edge_data(node, child)['weight']
                     queue.put((child_cost, child, path + [child]))
         return None
-    
+
     # A* search
     def a_star_search(self, start_node, goal_node):
         # Search the node that has the lowest combined cost and heuristic first.
@@ -199,11 +203,13 @@ class Problem:
                 return path
             for child in self.graph.neighbors(node):
                 if child not in path:
-                    child_cost = cost + self.graph.get_edge_data(node, child)['weight'] + self.graph.nodes[child]['h']
+                    child_cost = cost + \
+                        self.graph.get_edge_data(node, child)[
+                            'weight'] + self.graph.nodes[child]['h']
                     queue.put((child_cost, child, path + [child]))
         return None
-    
-    #greedy best first search
+
+    # greedy best first search
     def greedy_best_first_search(self, start_node, goal_node):
         # Search the node that has the lowest heuristic first.
         # Returns the path to the goal node if it is found, otherwise returns None.
@@ -218,9 +224,9 @@ class Problem:
                     child_cost = self.graph.nodes[child]['h']
                     queue.put((child_cost, child, path + [child]))
         return None
-    
-    
-    # depth-first search    
+
+    # depth-first search
+
     def depth_first_search(self, start_node, goal_node):
         # Search the deepest nodes in the search tree first using DFS.
         # Returns the path to the goal node if it is found, otherwise returns None.
@@ -233,9 +239,9 @@ class Problem:
                 if child not in path:
                     stack.append((child, path + [child]))
         return None
-    
-    
+
     # depth-limited-search
+
     def depth_limited_search(self, start_node, goal_node, depth_limit):
         # Search the deepest nodes in the search tree first using depth-limited search.
         # Returns the path to the goal node if it is found within the depth limit, otherwise returns None.
@@ -254,8 +260,8 @@ class Problem:
             if result is not None:
                 return result
         return None
-    
-    #Iterative deepening depth-first-search:
+
+    # Iterative deepening depth-first-search:
     def iterative_deepening_depth_first_search(self, start_node, goal_node, max_depth):
         for depth in range(1, max_depth + 1):
             result = self.depth_limited_search(start_node, goal_node, depth)
@@ -264,9 +270,9 @@ class Problem:
                 return result
         print("Goal not found within the depth limit.")
         return None
-   
-   
+
     # Bidirectional search
+
     def bidirectional_search(self, start, goal):
         # Initialize the forward and backward search graphs
         forward_graph = self.graph.subgraph([start])
@@ -282,10 +288,10 @@ class Problem:
 
         # Loop until the two search frontiers meet
         while forward_queue and backward_queue:
-        # Check if there is an intersection of the forward and backward explored sets
+            # Check if there is an intersection of the forward and backward explored sets
             intersection = forward_explored.intersection(backward_explored)
             if intersection:
-            # We have found a path from start to goal
+                # We have found a path from start to goal
                 path = []
                 node = intersection.pop()
                 # Follow the path from start to the intersection node
@@ -331,7 +337,8 @@ class Problem:
             # Loop over all the successors to find the one with the best score
             for successor in successors:
                 # Compute the score of the current successor
-                score = self.graph.get_edge_weight(current_node, successor) + self.heuristic(successor, goal_node)
+                score = self.graph.get_edge_weight(
+                    current_node, successor) + self.heuristic(successor, goal_node)
                 # Update the best successor and its score if the current successor has a better score
                 if score < best_score:
                     best_successor = successor
@@ -354,51 +361,51 @@ class Problem:
         return current_node
 
     def simulated_annealing(self, start_node, max_iterations=1000, temperature=1.0, cooling_rate=0.003):
-            # Initialize the current state as the start node
-            current_node = start_node
-            current_value = self.get_heuristic_value(current_node)
-            
-            # Initialize the best state as the current node
-            best_node = current_node
-            best_value = current_value
-            
-            # Initialize the iteration count
-            iteration = 1
-            
-            # Loop until max_iterations is reached
-            while iteration <= max_iterations:
-                # Calculate the current temperature based on cooling rate and iteration count
-                current_temperature = temperature / (1 + cooling_rate * iteration)
-                
-                # Get a random neighbor of the current node
-                neighbor_nodes = list(self.graph.neighbors(current_node))
-                if not neighbor_nodes:
-                    break
-                random_neighbor = random.choice(neighbor_nodes)
-                neighbor_value = self.get_heuristic_value(random_neighbor)
-                
-                # Calculate the energy difference between the current and neighbor states
-                energy_diff = current_value - neighbor_value
-                
-                # If the neighbor is better, move to that state
-                if energy_diff > 0:
+        # Initialize the current state as the start node
+        current_node = start_node
+        current_value = self.get_heuristic_value(current_node)
+
+        # Initialize the best state as the current node
+        best_node = current_node
+        best_value = current_value
+
+        # Initialize the iteration count
+        iteration = 1
+
+        # Loop until max_iterations is reached
+        while iteration <= max_iterations:
+            # Calculate the current temperature based on cooling rate and iteration count
+            current_temperature = temperature / (1 + cooling_rate * iteration)
+
+            # Get a random neighbor of the current node
+            neighbor_nodes = list(self.graph.neighbors(current_node))
+            if not neighbor_nodes:
+                break
+            random_neighbor = random.choice(neighbor_nodes)
+            neighbor_value = self.get_heuristic_value(random_neighbor)
+
+            # Calculate the energy difference between the current and neighbor states
+            energy_diff = current_value - neighbor_value
+
+            # If the neighbor is better, move to that state
+            if energy_diff > 0:
+                current_node = random_neighbor
+                current_value = neighbor_value
+                # If the neighbor is also better than the best state, update the best state
+                if current_value < best_value:
+                    best_node = current_node
+                    best_value = current_value
+            # If the neighbor is worse, randomly move to that state with a probability dependent on temperature
+            else:
+                probability = math.exp(energy_diff / current_temperature)
+                if random.random() < probability:
                     current_node = random_neighbor
-                    current_value = neighbor_value
-                    # If the neighbor is also better than the best state, update the best state
-                    if current_value < best_value:
-                        best_node = current_node
-                        best_value = current_value
-                # If the neighbor is worse, randomly move to that state with a probability dependent on temperature
-                else:
-                    probability = math.exp(energy_diff / current_temperature)
-                    if random.random() < probability:
-                        current_node = random_neighbor
-                
-                # Increment the iteration count
-                iteration += 1
-            
-            # Return the best state found
-            return best_node
+
+            # Increment the iteration count
+            iteration += 1
+
+        # Return the best state found
+        return best_node
 
     @staticmethod
     def child(self, parent, edge):
@@ -430,9 +437,8 @@ class Problem:
                     break
             return min_value
 
-
     def get_heuristic_value(self, node):
-            try:
-                return self.graph.nodes[node]['h']
-            except KeyError:
-                return float('inf')
+        try:
+            return self.graph.nodes[node]['h']
+        except KeyError:
+            return float('inf')

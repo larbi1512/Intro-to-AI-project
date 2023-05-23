@@ -6,13 +6,12 @@ from gui import *
 
 
 class toolbox:
-    def __init__(self, problem):
+    def __init__(self):
         self.__problem = Problem([])
-        self.__problem = problem
         self.Menu()
 
     def Menu(self):
-        main_menu()
+        main_menu(self.__problem)
 
     # path parameter here will be replaced when calling this function with
     # the functions of uninformed or infomed search
@@ -34,10 +33,12 @@ class toolbox:
             print(edge_labels)
             # Draw the new graph with the updated colors and the initial positions of the nodes
 
-            nx.draw(self.__problem.graph, init_pos, node_color=node_colors, with_labels=True)
-            nx.draw_networkx_edge_labels(self.__problem.graph, init_pos, edge_labels=edge_labels)
-            nx.draw_networkx_labels(self.__problem.graph, init_pos, labels=nx.get_node_attributes(self.__problem.graph, 'h'))
-
+            nx.draw(self.__problem.graph, init_pos,
+                    node_color=node_colors, with_labels=True)
+            nx.draw_networkx_edge_labels(
+                self.__problem.graph, init_pos, edge_labels=edge_labels)
+            nx.draw_networkx_labels(self.__problem.graph, init_pos,
+                                    labels=nx.get_node_attributes(self.__problem.graph, 'h'))
 
         # Create the animation
         ani = FuncAnimation(plt.gcf(), update, frames=len(
