@@ -1,22 +1,19 @@
+from board import *
+from game import *
+from constaints import *
 import pygame
 pygame.font.init()
-from constaints import *
-from game import *
-from board import *
 
 agent = {
-        "human": 0,
-        "AI": 1
-    }
+    "human": 0,
+    "AI": 1
+}
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Connect 4")
 
+
 def main():
-    game = Game(agent["AI"], agent["human"], 6)
-    WIN.fill((0, 0, 0))
-    game.board.draw_board(WIN)
-    pygame.display.update()
-    game.make_move_AI()
+    game = Game(agent["human"], agent["AI"], 6)
     clock = pygame.time.Clock()
     run = True
     while run:
@@ -35,14 +32,12 @@ def main():
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 game.restart()
-                game.make_move_AI()
 
         WIN.fill((0, 0, 0))
         game.board.draw_board(WIN)
         pygame.display.update()
 
     pygame.quit()
-
 
 
 if __name__ == "__main__":
