@@ -1,8 +1,13 @@
+import main
 import tkinter as tk
 from problem import Problem
 import networkx as nx
 from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
+
+# importing the file of the game
+import sys
+sys.path.insert(1, 'connect 4/main.py')
 
 
 def get_user_edge(entry_1, entry_2, entry_3, p):
@@ -15,6 +20,9 @@ def get_user_edge(entry_1, entry_2, entry_3, p):
     edge.append(node_2)
     p.add_an_edge(edge)
     p.modify_edge_weight(edge, entry_3.get())
+    entry_1.delete(0, tk.END)
+    entry_2.delete(0, tk.END)
+    entry_3.delete(0, tk.END)
 
 
 def get_node_info(entry_1, entry_2, p):
@@ -25,6 +33,8 @@ def get_node_info(entry_1, entry_2, p):
         value = 0
     p.add_a_node(label)  # add a node to the problem graph
     p.modify_heuristic_value(label, value)
+    entry_1.delete(0, tk.END)
+    entry_2.delete(0, tk.END)
 
 
 def add_initial_state(root, entry_1, p):
@@ -83,7 +93,7 @@ def main_menu(p, sender=0):
         global root
         root = tk.Tk()  # parent window
 
-    width, height = 600, 700
+    width, height = 650, 800
     v_dim = str(width)+'x'+str(height)
     root.geometry(v_dim)  # Size of the window
     root.title("AI Project")  # Adding a title
@@ -113,7 +123,7 @@ def problem_interface(sender, p):
 
     delete_content(sender)
 
-    width, height = 600, 700
+    width, height = 650, 800
     v_dim = str(width)+'x'+str(height)
     root.geometry(v_dim)  # Size of the window
     root.title("AI Project")  # Adding a title
@@ -165,7 +175,7 @@ def problem_interface(sender, p):
 def initial_state_interface(sender, p):
     delete_content(sender)
 
-    width, height = 600, 700
+    width, height = 650, 800
     v_dim = str(width)+'x'+str(height)
     root.geometry(v_dim)  # Size of the window
     root.title("AI Project")  # Adding a title
@@ -205,7 +215,7 @@ def initial_state_interface(sender, p):
 def goal_states_interface(sender, p):
     delete_content(sender)
 
-    width, height = 600, 700
+    width, height = 650, 800
     v_dim = str(width)+'x'+str(height)
     root.geometry(v_dim)  # Size of the window
     root.title("AI Project")  # Adding a title
@@ -253,7 +263,7 @@ def goal_states_interface(sender, p):
 def edges_interface(sender, p):
     delete_content(sender)
 
-    width, height = 600, 700
+    width, height = 650, 800
     v_dim = str(width)+'x'+str(height)
     root.geometry(v_dim)  # Size of the window
     root.title("AI Project")  # Adding a title
@@ -322,7 +332,7 @@ def algorithms_menu(p, sender=0):
 
     delete_content(sender)
 
-    width, height = 600, 700
+    width, height = 650, 800
     v_dim = str(width)+'x'+str(height)
     root.geometry(v_dim)  # Size of the window
     root.title("AI Project")  # Adding a title
@@ -335,37 +345,59 @@ def algorithms_menu(p, sender=0):
         root, text="Choose the algorithm you want to use", font=('Arial', 20))
     label.pack(padx=20, pady=30)
 
-    button = tk.Button(root, text="Breadth first search", font=(
+    button = tk.Button(root, text="                Breadth first search                ", font=(
         'Arial', 18), command=lambda: animate_solution(p, p.breadth_first_search(p.initial_state, "C"))
     )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
-    button = tk.Button(root, text="Depth first search", font=(
-        'Arial', 18), command=lambda: print(p.goal_states)
+    button = tk.Button(root, text="                Depth First Search                ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.depth_first_search(p.initial_state, "C"))
     )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
-    button = tk.Button(root, text="Depth limited first search", font=(
-        'Arial', 18), command=lambda: print(p.edges_list)
+    button = tk.Button(root, text="          Depth Limited First Search          ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.depth_limited_search(p.initial_state, "C"), 3)
     )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
-    button = tk.Button(root, text="Iterative deepening depth first search", font=(
-        'Arial', 18), command=lambda: print(p.heuristic_values_list)
+    button = tk.Button(root, text="Iterative Deepening Depth First Search", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.iterative_deepening_depth_first_search(p.initial_state, "C"))
     )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
-    button = tk.Button(root, text="Hill climbing", font=(
-        'Arial', 18))  # call the function of this algorithm
-    button.pack(padx=10, pady=10)
-
-    button = tk.Button(root, text="Simulated annealing", font=(
-        'Arial', 18), command=lambda: print(p.graph)
+    button = tk.Button(root, text="             Uniformed Cost Search            ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.uniform_cost_search(p.initial_state, "C"))
     )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
-    button = tk.Button(root, text="Minimax", font=(
-        'Arial', 18))  # call the function of this algorithm
+    button = tk.Button(root, text="                       A* Search                       ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.a_star_search(p.initial_state, "C"))
+    )  # call the function of this algorithm
+    button.pack(padx=10, pady=10)
+
+    button = tk.Button(root, text="           Greedy Best First Search           ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.greedy_best_first_search(p.initial_state, "C"))
+    )  # call the function of this algorithm
+    button.pack(padx=10, pady=10)
+
+    button = tk.Button(root, text="               Bidirectional Search               ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.bidirectional_search(p.initial_state, "C"))
+    )  # call the function of this algorithm
+    button.pack(padx=10, pady=10)
+
+    button = tk.Button(root, text="                     Hill Climbing                     ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.hill_climbing(p.initial_state, "C"))
+    )  # call the function of this algorithm
+    button.pack(padx=10, pady=10)
+
+    button = tk.Button(root, text="               Simulated annealing              ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.simulated_annealing(p.initial_state, "C"))
+    )  # call the function of this algorithm
+    button.pack(padx=10, pady=10)
+
+    button = tk.Button(root, text="                       Minimax                         ", font=(
+        'Arial', 18), command=lambda: animate_solution(p, p.minimax(p.initial_state, "C"))
+    )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="         Exit         ",
@@ -374,7 +406,7 @@ def algorithms_menu(p, sender=0):
 
     button = tk.Button(root, text="    Main menu   ", font=(
         'Arial', 18), command=lambda: main_menu(root, p))
-    button.pack(padx=10, pady=10, side="bottom")
+    button.pack(padx=10, pady=15, side="bottom")
 
     root.mainloop()  # Keep the window open
 
