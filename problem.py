@@ -405,14 +405,12 @@ class Problem:
                 
                 # If the neighbor is better, move to that state
                 if energy_diff > 0:
-
                     current_node = random_neighbor
-
-            # Increment the iteration count
-            iteration += 1
-
-        # Return the best state found
-        return best_node
+                # Increment the iteration count
+                iteration += 1
+                
+            # Return the best state found
+            return best_node
 
     def minimax(self, node, depth, alpha, beta, maximizing_player):
         if depth == 0 or self.graph.out_degree(node) == 0:
