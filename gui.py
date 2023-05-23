@@ -356,12 +356,12 @@ def algorithms_menu(p, sender=0):
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="          Depth Limited First Search          ", font=(
-        'Arial', 18), command=lambda: animate_solution(p, p.depth_limited_search(p.initial_state, "C"), 3)
-    )  # call the function of this algorithm
+        'Arial', 18), command=lambda: animate_solution(p, p.depth_limited_search(p.initial_state, "C", 3)
+                                                       ))  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
     button = tk.Button(root, text="Iterative Deepening Depth First Search", font=(
-        'Arial', 18), command=lambda: animate_solution(p, p.iterative_deepening_depth_first_search(p.initial_state, "C"))
+        'Arial', 18), command=lambda: animate_solution(p, p.iterative_deepening_depth_first_search(p.initial_state, "C", 5))
     )  # call the function of this algorithm
     button.pack(padx=10, pady=10)
 
