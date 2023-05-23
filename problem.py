@@ -106,12 +106,16 @@ class Problem:
     #also, if one or both nodes in the edge_couple doesn't exist, it will be created
     def modify_edge_weight(self, edge_couple, new_weight):
         self.__graph.add_edge(edge_couple[0], edge_couple[1], weight = new_weight)
-    
-    
         
+        
+    # get the weight of the edge
+    def get_edge_weight(self, edge_couple):
+        edge_data = self.__graph.get_edge_data(edge_couple[0], edge_couple[1])
+        if edge_data is not None and 'weight' in edge_data:
+            return int(edge_data['weight'])
+        else:
+            return 0
     
-    
-
     #weight is an integer number
     def add_an_edge(self, edge_couple, weight=None):
         if weight is not None:
@@ -125,16 +129,65 @@ class Problem:
     def modify_heuristic_value(self, node_name, goal_node, new_heuristic_value):
         if node_name not in self.__graph.nodes:
             self.__graph.add_node(node_name)
-        self.__graph.nodes[node_name][goal_node] = new_heuristic_value
+        self.__graph.nodes[node_name]['h'] = new_heuristic_value
+  
+      
+# heuristic getter 
+    def get_heuristic(self, node):
+        try:
+            return self.__graph.nodes[node]['h']
+        except KeyError:
+            return 0
+        
 
     @property
     def graph(self):
         return self.__graph
-    # get the weight of the edge
-    def get_edge_weight(self, edge_couple):
-        return self.__graph.get_edge_data(edge_couple[0], edge_couple[1], default=0)
     
+    def hill_climbing(self, start_node, goal_node):
+        # Initialize the current node to the start node
+        current_node = start_node
+        # Loop until we reach the goal node or can't find a better successor
+        while current_node != goal_node:
+            # Initialize variables to keep track of the best successor and its score
+            best_successor = None
+            best_score = float("inf")
+            # Loop over all the neighbors (successors) of the current node
+            for successor in self.graph.neighbors(current_node):
+                # Compute the score of the current successor
+                score = self.get_edge_weight((current_node, successor)) + self.heuristic(successor, goal_node)
+                # Update the best successor and its score if the current successor has a better score
+                if score < best_score:
+                    best_successor = successor
+                    best_score = score
+            # If there's no better successor, return the current node (we're stuck)
+            if best_successor is None or self.heuristic(best_successor, goal_node) >= self.heuristic(current_node, goal_node):
+                return current_node
+            # Otherwise, setcurrent node to the best successor and continue the loop
+            current_node = best_successor
+        # If we reach this point, we've found the goal node
+        return current_node
     
+    # uniform-cost search
+    def uniform_cost_search(self, start_node, goal_node):
+        # Search the node that has the lowest cumulative cost first.
+        # Returns the path to the goal node if it is found, otherwise returns None.
+        queue = PriorityQueue()
+        queue.put((0, start_node, [start_node]))
+        explored = set()
+        while not queue.empty():
+            cost, node, path = queue.get()
+            if node == goal_node:
+                return path
+            if node not in explored:
+                explored.add(node)
+                for child_node in self.__graph.neighbors(node):
+                    if child_node not in path:
+                        child_cost = cost + self.get_edge_weight((node, child_node))
+                        if child_cost is None:
+                            child_cost = 0
+                        queue.put((child_cost, child_node, path + [child_node]))
+        return None
     
     
     def breadth_first_search(self, start_node, goal_node):
@@ -152,21 +205,6 @@ class Problem:
                     queue.append((child, path + [child]))
         return None
     
-    # uniform-cost search
-    def uniform_cost_search(self, start_node, goal_node):
-        # Search the node that has the lowest cumulative cost first.
-        # Returns the path to the goal node if it is found, otherwise returns None.
-        queue = PriorityQueue()
-        queue.put((0, start_node, [start_node]))
-        while queue:
-            cost, node, path = queue.get()
-            if node == goal_node:
-                return path
-            for child in self.graph.neighbors(node):
-                if child not in path:
-                    child_cost = cost + self.get_edge_weight(("node", "child"))
-                    queue.put((child_cost, child, path + [child]))
-        return None
     
     # A* search
     def a_star_search(self, start_node, goal_node):
@@ -174,13 +212,17 @@ class Problem:
         # Returns the path to the goal node if it is found, otherwise returns None.
         queue = PriorityQueue()
         queue.put((0, start_node, [start_node]))
+        visited = {start_node: 0}
         while queue:
             cost, node, path = queue.get()
+            print(node, " : " , cost)
             if node == goal_node:
                 return path
             for child in self.graph.neighbors(node):
-                if child not in path:
-                    child_cost = cost + self.graph.get_edge_data(node, child)['weight'] + self.graph.nodes[child]['h']
+                child_cost = self.get_edge_weight((node, child)) + self.get_heuristic(child)
+                if child not in visited or child_cost < visited[child]:
+                    visited[child] = child_cost
+                    print("Child node is:", child, "with cost:",child_cost)
                     queue.put((child_cost, child, path + [child]))
         return None
     
@@ -196,11 +238,10 @@ class Problem:
                 return path
             for child in self.graph.neighbors(node):
                 if child not in path:
-                    child_cost = self.graph.nodes[child]['h']
+                    child_cost = self.get_heuristic(child)
                     queue.put((child_cost, child, path + [child]))
         return None
-    
-    
+     
     # depth-first search    
     def depth_first_search(self, start_node, goal_node):
         # Search the deepest nodes in the search tree first using DFS.
@@ -253,15 +294,15 @@ class Problem:
         forward_graph = self.graph.subgraph([start])
         backward_graph = self.graph.subgraph([goal])
 
-    # Initialize the sets of explored nodes for each direction
+         # Initialize the sets of explored nodes for each direction
         forward_explored = set([start])
         backward_explored = set([goal])
 
-    # Initialize the queue of nodes to explore for each direction
+        # Initialize the queue of nodes to explore for each direction
         forward_queue = [start]
         backward_queue = [goal]
 
-    # Loop until the two search frontiers meet
+     # Loop until the two search frontiers meet
         while forward_queue and backward_queue:
         # Check if there is an intersection of the forward and backward explored sets
             intersection = forward_explored.intersection(backward_explored)
@@ -298,46 +339,14 @@ class Problem:
                     backward_explored.add(neighbor)
                     backward_queue.append(neighbor)
 
-    # No path was found
+      # No path was found
         return None
 
-    def hill_climbing(self, start_node, goal_node):
-        # Define a nested function to get the best successor node
-        def get_best_successor():
-            # Get all the neighbors (successors) of the current node
-            successors = self.graph.neighbors(current_node)
-            # Initialize variables to keep track of the best successor and its score
-            best_successor = None
-            best_score = float("inf")
-            # Loop over all the successors to find the one with the best score
-            for successor in successors:
-                # Compute the score of the current successor
-                score = self.graph.get_edge_data(current_node, successor) + self.heuristic(successor, goal_node)
-                # Update the best successor and its score if the current successor has a better score
-                if score < best_score:
-                    best_successor = successor
-                    best_score = score
-            # Return the best successor
-            return best_successor
-
-        # Initialize the current node to the start node
-        current_node = start_node
-        # Loop until we reach the goal node or can't find a better successor
-        while current_node != goal_node:
-            # Get the best successor of the current node
-            successor = get_best_successor()
-            # If there's no better successor, return the current node (we're stuck)
-            if successor is None or self.heuristic(successor, goal_node) >= self.heuristic(current_node, goal_node):
-                return current_node
-            # Otherwise, set the current node to the best successor and continue the loop
-            current_node = successor
-        # If we reach this point, we've found the goal node
-        return current_node
 
     def simulated_annealing(self, start_node, max_iterations=1000, temperature=1.0, cooling_rate=0.003):
             # Initialize the current state as the start node
             current_node = start_node
-            current_value = self.get_heuristic_value(current_node)
+            current_value = self.get_heuristic(current_node)
             
             # Initialize the best state as the current node
             best_node = current_node
@@ -356,7 +365,7 @@ class Problem:
                 if not neighbor_nodes:
                     break
                 random_neighbor = random.choice(neighbor_nodes)
-                neighbor_value = self.get_heuristic_value(random_neighbor)
+                neighbor_value = self.heuristic(random_neighbor, goal_node)
                 
                 # Calculate the energy difference between the current and neighbor states
                 energy_diff = current_value - neighbor_value
@@ -381,40 +390,22 @@ class Problem:
             # Return the best state found
             return best_node
 
-    @staticmethod
-    def child(self, parent, edge):
-        if edge[0] == parent:
-            return edge[1]
-        else:
-            return None
-
     def minimax(self, node, depth, alpha, beta, maximizing_player):
         if depth == 0 or self.graph.out_degree(node) == 0:
-            return self.graph.nodes[node]['h']
+            return self.get_heuristic(node)
 
-        if maximizing_player:
-            max_value = float("inf")
-            for child in self.graph.successors(node):
-                value = self.minimax(child, depth - 1, alpha, beta, False)
-                max_value = max(max_value, value)
-                alpha = max(alpha, max_value)
-                if beta <= alpha:
-                    break
-            return max_value
-        else:
-            min_value = float("inf")
-            for child in self.graph.successors(node):
-                value = self.minimax(child, depth - 1, alpha, beta, True)
-                min_value = min(min_value, value)
-                beta = min(beta, min_value)
-                if beta <= alpha:
-                    break
-            return min_value
+        min_or_max = max if maximizing_player else min
+        result = float("-inf") if maximizing_player else float("inf")
+        for child in self.graph.neighbors(node):
+            value = self.minimax(child, depth - 1, alpha, beta, not maximizing_player)
+            result = min_or_max(result, value)
+            if maximizing_player:
+                alpha = max(alpha, result)
+            else:
+                beta = min(beta, result)
+            if beta <= alpha:
+                break
 
+        return result
 
-    def get_heuristic_value(self, node):
-            try:
-                return self.graph.nodes[node]['h']
-            except KeyError:
-                return float('inf')
             
