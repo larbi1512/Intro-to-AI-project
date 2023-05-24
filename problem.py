@@ -322,58 +322,47 @@ class Problem:
 
     # Bidirectional search
 
-    def bidirectional_search(self, start, goal):
-        # Initialize the forward and backward search graphs
-        forward_graph = self.graph.subgraph([start])
-        backward_graph = self.graph.subgraph([goal])
 
-         # Initialize the sets of explored nodes for each direction
-        forward_explored = set([start])
-        backward_explored = set([goal])
+    def bidirectional_search(self, start_node, goal_nodes):
+        # Perform bidirectional search from the start node to any of the goal nodes
+        forward_queue = deque([(start_node, [start_node])])
+        backward_queue = deque([(goal_node, [goal_node])
+                               for goal_node in goal_nodes])
+        forward_visited = set()
+        backward_visited = set(goal_nodes)
 
-        # Initialize the queue of nodes to explore for each direction
-        forward_queue = [start]
-        backward_queue = [goal]
-
-     # Loop until the two search frontiers meet
         while forward_queue and backward_queue:
-            # Check if there is an intersection of the forward and backward explored sets
-            intersection = forward_explored.intersection(backward_explored)
-            if intersection:
-                # We have found a path from start to goal
-                path = []
-                node = intersection.pop()
-                # Follow the path from start to the intersection node
-                while node != start:
-                    path.append(node)
-                    node = next(n for n in forward_graph.predecessors(node))
-                path.append(start)
-                path.reverse()
-            # Follow the path from the intersection node to the goal
-                node = next(n for n in backward_graph.predecessors(node))
-                while node != goal:
-                    path.append(node)
-                    node = next(n for n in backward_graph.predecessors(node))
-                path.append(goal)
-                return path
+            # Expand nodes in the forward direction
+            forward_node, forward_path = forward_queue.popleft()
+            forward_visited.add(forward_node)
 
-        # Explore one step in each direction
-            forward_node = forward_queue.pop(0)
-            for neighbor in self.graph.neighbors(forward_node):
-                if neighbor not in forward_explored:
-                    forward_graph.add_edge(forward_node, neighbor)
-                    forward_explored.add(neighbor)
-                    forward_queue.append(neighbor)
+            if forward_node in backward_visited:
+                # Path from start to goal found
+                return forward_path + backward_queue[forward_node][1]
 
-            backward_node = backward_queue.pop(0)
-            for neighbor in self.graph.neighbors(backward_node):
-                if neighbor not in backward_explored:
-                    backward_graph.add_edge(backward_node, neighbor)
-                    backward_explored.add(neighbor)
-                    backward_queue.append(neighbor)
+            for forward_child in self.graph.neighbors(forward_node):
+                if forward_child not in forward_visited and forward_child not in [node for node, _ in forward_queue]:
+                    forward_queue.append(
+                        (forward_child, forward_path + [forward_child]))
 
-      # No path was found
+            # Expand nodes in the backward direction
+            backward_node, backward_path = backward_queue.popleft()
+            backward_visited.remove(backward_node)
+
+            if backward_node in forward_visited:
+                # Path from start to goal found
+                return forward_queue[backward_node][1] + backward_path
+
+            for backward_child in self.graph.neighbors(backward_node):
+                if backward_child not in backward_visited and backward_child not in [node for node, _ in backward_queue]:
+                    backward_queue.append(
+                        (backward_child, backward_path + [backward_child]))
+                    backward_visited.add(backward_child)
+
+        # No path found
         return None
+
+
 
 
     def simulated_annealing(self, start_node, max_iterations=1000, temperature=1.0, cooling_rate=0.003):
