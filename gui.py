@@ -629,4 +629,5 @@ def algorithms_menu(p, sender=0):
 
 p = Problem([])
 csp = CSP()
+csp2 = CSP()
 main_menu(p, csp)
