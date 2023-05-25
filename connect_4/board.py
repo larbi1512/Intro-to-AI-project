@@ -542,6 +542,8 @@ class Board:
 
          label = font.render(f"Score: {self.cross_player_score}", 1, (255, 255, 255))
          win.blit(label, (WINDOW_PADDING + LINE_WIDTH * self.size + self.size * self.SQUARE_SIZE + 100 + self.SQUARE_SIZE/2 + 50, WINDOW_PADDING + 200 + 8 + 120))
+
+         self.display_winner(win)
                         
 
     
@@ -554,7 +556,7 @@ class Board:
          pass
     
     def display_winner(self, win):
-         if(self.turn_number >= self.size * 2 + 1):
+         if(self.turn_number >= self.size * self.size + 1):
              fontname = 'times'
              fontsize = 24
              font = pygame.font.SysFont(fontname, fontsize)
@@ -562,16 +564,18 @@ class Board:
              winner = "Tie"
 
              if(self.circle_player_score > self.cross_player_score):
-                 winner = "Cross player wins"
-                 label = font.render(winner, 1, (255, 255, 255))
-                 win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 50, WINDOW_PADDING))
-             elif(self.circle_player_score < self.cross_player_score):
                  winner = "Circle player wins"
                  label = font.render(winner, 1, (255, 255, 255))
-                 win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 50, WINDOW_PADDING))
+                 win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 50 + 40, 630))
+                 return
+             elif(self.circle_player_score < self.cross_player_score):
+                 winner = "Cross player wins"
+                 label = font.render(winner, 1, (255, 255, 255))
+                 win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 50 + 40, 630))
+                 return
         
              label = font.render("Tie", 1, (255, 255, 255))
-             win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 50, WINDOW_PADDING))
+             win.blit(label, (WINDOW_PADDING + self.SQUARE_SIZE * self.size + 100 + 50 + 110, 630))
     
 
     
