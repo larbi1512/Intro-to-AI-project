@@ -12,7 +12,7 @@ class toolbox:
         self.Menu()
 
     def Menu(self):
-        main_menu()
+        main_menu(self.__problem)
 
     # path parameter here will be replaced when calling this function with
     # the functions of uninformed or infomed search

@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 import math
-import deque
+from collections import deque
 
 
 ## an important thing to consider when using the class problem
