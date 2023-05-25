@@ -161,9 +161,8 @@ class Problem:
         if node_name not in self.__graph.nodes:
             self.__graph.add_node(node_name)
         self.__graph.nodes[node_name]['h'] = new_heuristic_value
-  
-      
-# heuristic getter 
+       
+    #heuristic getter 
     def get_heuristic(self, node):
         try:
             return self.__graph.nodes[node]['h']
@@ -176,40 +175,40 @@ class Problem:
     def graph(self):
         return self.__graph
     
-    def hill_climbing(self, start_node, goal_node):
+    def hill_climbing(self):
         # Initialize the current node to the start node
-        current_node = start_node
+        current_node = self.initial_state
         # Loop until we reach the goal node or can't find a better successor
-        while current_node != goal_node:
+        best_score = float("inf")
+        while current_node != self.goal_states:
             # Initialize variables to keep track of the best successor and its score
             best_successor = None
-            best_score = float("inf")
             # Loop over all the neighbors (successors) of the current node
             for successor in self.graph.neighbors(current_node):
                 # Compute the score of the current successor
-                score = self.get_edge_weight((current_node, successor)) + self.heuristic(successor, goal_node)
+                score = self.get_edge_weight((current_node, successor)) + self.get_heuristic(successor)
                 # Update the best successor and its score if the current successor has a better score
                 if score < best_score:
                     best_successor = successor
                     best_score = score
-            # If there's no better successor, return the current node (we're stuck)
-            if best_successor is None or self.heuristic(best_successor, goal_node) >= self.heuristic(current_node, goal_node):
+             # If there's no better successor, return the current node (we're stuck)
+            if best_successor is None or self.get_heuristic(current_node) < self.get_heuristic(best_successor):
                 return current_node
-            # Otherwise, setcurrent node to the best successor and continue the loop
+            # Otherwise, set current node to the best successor and continue the loop
             current_node = best_successor
         # If we reach this point, we've found the goal node
         return current_node
     
     # uniform-cost search
-    def uniform_cost_search(self, start_node, goal_node):
+    def uniform_cost_search(self):
         # Search the node that has the lowest cumulative cost first.
         # Returns the path to the goal node if it is found, otherwise returns None.
         queue = PriorityQueue()
-        queue.put((0, start_node, [start_node]))
+        queue.put((0, self.initial_state, [self.initial_state]))
         explored = set()
         while not queue.empty():
             cost, node, path = queue.get()
-            if node == goal_node:
+            if node in self.goal_states:
                 return path
             if node not in explored:
                 explored.add(node)
@@ -222,14 +221,14 @@ class Problem:
         return None
     
     
-    def breadth_first_search(self, start_node, goal_node):
+    def breadth_first_search(self):
         # Search the shallowest nodes in the search tree first using BFS.
         # Returns the path to the goal node if it is found, otherwise returns None.
         visited = set()
-        queue = deque([(start_node, [start_node])])
+        queue = deque([(self.initial_state, [self.initial_state])])
         while queue:
             node, path = queue.popleft()
-            if node == goal_node:
+            if node in self.goal_states:
                 return path
             visited.add(node)
             for child in self.graph.neighbors(node):
@@ -240,34 +239,32 @@ class Problem:
     
 
     # A* search
-    def a_star_search(self, start_node, goal_node):
+    def a_star_search(self):
         # Search the node that has the lowest combined cost and heuristic first.
         # Returns the path to the goal node if it is found, otherwise returns None.
         queue = PriorityQueue()
-        queue.put((0, start_node, [start_node]))
-        visited = {start_node: 0}
+        queue.put((0, self.initial_state, [self.initial_state]))
+        visited = {self.initial_state: 0}
         while queue:
             cost, node, path = queue.get()
-            print(node, " : " , cost)
-            if node == goal_node:
+            if node in self.goal_states:
                 return path
             for child in self.graph.neighbors(node):
                 child_cost = self.get_edge_weight((node, child)) + self.get_heuristic(child)
                 if child not in visited or child_cost < visited[child]:
                     visited[child] = child_cost
-                    print("Child node is:", child, "with cost:",child_cost)
                     queue.put((child_cost, child, path + [child]))
         return None
     
     #greedy best first search
-    def greedy_best_first_search(self, start_node, goal_node):
+    def greedy_best_first_search(self):
         # Search the node that has the lowest heuristic first.
         # Returns the path to the goal node if it is found, otherwise returns None.
         queue = PriorityQueue()
-        queue.put((0, start_node, [start_node]))
+        queue.put((0, self.initial_state, [self.initial_state]))
         while queue:
             cost, node, path = queue.get()
-            if node == goal_node:
+            if node in self.goal_states:
                 return path
             for child in self.graph.neighbors(node):
                 if child not in path:
@@ -276,13 +273,13 @@ class Problem:
         return None
      
     # depth-first search    
-    def depth_first_search(self, start_node, goal_node):
+    def depth_first_search(self):
         # Search the deepest nodes in the search tree first using DFS.
         # Returns the path to the goal node if it is found, otherwise returns None.
-        stack = [(start_node, [start_node])]
+        stack = [(self.initial_state, [self.initial_state])]
         while stack:
             node, path = stack.pop()
-            if node == goal_node:
+            if node in self.goal_states:
                 return path
             for child in self.graph.neighbors(node):
                 if child not in path:
@@ -291,11 +288,11 @@ class Problem:
 
       
     # depth-limited-search
-    def depth_limited_search(self, start_node, goal_node, depth_limit):
+    def depth_limited_search(self, depth_limit):
         # Search the deepest nodes in the search tree first using depth-limited search.
         # Returns the path to the goal node if it is found within the depth limit, otherwise returns None.
         def recursive_dls(node, depth):
-            if depth == 0 and node == goal_node:
+            if depth == 0 and node in self.goal_states:
                 return [node]
             elif depth > 0:
                 for child in self.graph.neighbors(node):
@@ -305,19 +302,18 @@ class Problem:
             return None
 
         for depth in range(depth_limit):
-            result = recursive_dls(start_node, depth)
+            result = recursive_dls(self.initial_state, depth)
             if result is not None:
                 return result
         return None
 
     # Iterative deepening depth-first-search:
-    def iterative_deepening_depth_first_search(self, start_node, goal_node, max_depth):
+    def iterative_deepening_depth_first_search(self, max_depth):
         for depth in range(1, max_depth + 1):
-            result = self.depth_limited_search(start_node, goal_node, depth)
+            result = self.depth_limited_search(depth)
             if result is not None:
                 print(result)
                 return result
-        print("Goal not found within the depth limit.")
         return None
 
     # Bidirectional search
@@ -376,9 +372,9 @@ class Problem:
         return None
 
 
-    def simulated_annealing(self, start_node, max_iterations=1000, temperature=1.0, cooling_rate=0.003):
+    def simulated_annealing(self, max_iterations=1000, temperature=1.0, cooling_rate=0.003):
             # Initialize the current state as the start node
-            current_node = start_node
+            current_node = self.initial_state
             current_value = self.get_heuristic(current_node)
             
             # Initialize the best state as the current node
@@ -398,7 +394,7 @@ class Problem:
                 if not neighbor_nodes:
                     break
                 random_neighbor = random.choice(neighbor_nodes)
-                neighbor_value = self.heuristic(random_neighbor, goal_node)
+                neighbor_value = self.get_heuristic(random_neighbor)
                 
                 # Calculate the energy difference between the current and neighbor states
                 energy_diff = current_value - neighbor_value
