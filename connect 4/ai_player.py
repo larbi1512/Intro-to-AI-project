@@ -14,7 +14,7 @@ symbol = {
         "min": -1
     }
 
-DEPTH = 2
+DEPTH = 0
 
 def next_move(i, j, size):
     if i >= size - j - 1 and i < j:
