@@ -1,6 +1,3 @@
-from board import *
-from game import *
-from constaints import *
 import pygame
 pygame.font.init()
 
@@ -12,7 +9,7 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Connect 4")
 
 
-def main():
+def game_menu():
     game = Game(agent["human"], agent["AI"], 6)
     clock = pygame.time.Clock()
     run = True
@@ -40,5 +37,4 @@ def main():
     pygame.quit()
 
 
-if __name__ == "__main__":
-    main()
+game_menu()
