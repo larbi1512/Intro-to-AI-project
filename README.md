@@ -25,13 +25,14 @@ The CSP solver module within the toolbox enables you to solve complex constraint
 
 ## Contributors
 The AI Toolbox project has benefited from the contributions and efforts of the following individuals:
-
-Mohamed Najib Bentayeb - @NajibPro
-chellal Abdelhak- @Abdelhak-Chellal
-Saidchikh Larbi- @larbi1512
-Kadri Mohamed Mouncef- @MoonFuji
-Grine Bassel Abdessamad- @AbdouGitt
-OuladAli Marouane Abdeljalil- @marouaneoa
+<ul>
+  <li> Mohamed Najib Bentayeb - <a href="https://github.com/NajibPro">@NajibPro</a> </li>
+  <li>chellal Abdelhak- <a href="https://github.com/Abdelhak-Chellal">@Abdelhak-Chellal</a></li>
+<li>Saidchikh Larbi- <a href="https://github.com/larbi1512">@larbi1512</a></li>
+<li>Kadri Mohamed Mouncef- <a href="https://github.com/MoonFuji">@MoonFuji</a></li>
+<li>Grine Bassel Abdessamad- <a href="https://github.com/AbdouGitt">@AbdouGitt</a></li>
+<li>OuladAli Marouane Abdeljalil- <a href="https://github.com/marouaneoa">@marouaneoa</a></li>
+ </ul>
 
 We would like to express our sincere appreciation for their valuable contributions, including code contributions, bug fixes, feature suggestions, and documentation improvements. Their dedication has played a crucial role in enhancing the functionality and usability of the AI Toolbox.
 
